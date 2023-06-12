@@ -13,6 +13,7 @@ public class BinanceRestClientConfig {
 @Bean
 public BinanceApiRestClient binanceApiRestClient(){
 BinanceApiRestClient client=BinanceApiClientFactory.newInstance().newRestClient();
+
 return client;
     }
 }

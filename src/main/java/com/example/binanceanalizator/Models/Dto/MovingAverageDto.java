@@ -1,5 +1,8 @@
 package com.example.binanceanalizator.Models.Dto;
 
+import com.example.binanceanalizator.Models.EMA;
+import com.example.binanceanalizator.Models.SMA;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -7,12 +10,14 @@ import lombok.experimental.FieldDefaults;
 import java.time.Instant;
 import java.util.UUID;
 
-@Builder
+
 @Data
+@Builder
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TickerStatisticsDto {
-    String symbol;
-    double averagePriceByCandleStick;
-    double percentChange;
-    double absoluteChange;
+public class MovingAverageDto {
+    SMA sma;
+    EMA ema;
+    double bidPrice;
+
 }

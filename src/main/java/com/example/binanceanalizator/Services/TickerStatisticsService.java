@@ -65,7 +65,6 @@ return TickerStatisticsRedis.builder()
 public void saveInMemoryDb(TickerStatisticsRedis tickerStatisticsRedis){
 
     redisTemplate.opsForHash().put(KEY,tickerStatisticsRedis.getId(),tickerStatisticsRedis);
-
 }
 
 
