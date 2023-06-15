@@ -1,0 +1,109 @@
+package com.example.binanceanalizator;
+
+import com.example.binanceanalizator.Controllers.Rest.AuthenticationController;
+import com.example.binanceanalizator.Controllers.Rest.StatsRestController;
+import com.example.binanceanalizator.Models.Entities.Embedded.User;
+import com.example.binanceanalizator.Models.Factories.UserFactory;
+import com.example.binanceanalizator.Services.MovingAverageService;
+import com.example.binanceanalizator.Services.UserService;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
+@Log4j2
+@SpringBootTest
+@AutoConfigureMockMvc
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class MVCAuthenticationTests {
+    @Autowired
+    MockMvc mockMvc;
+
+    ObjectMapper mapper=new ObjectMapper();
+    @Autowired
+    MovingAverageService movingAverageService;
+    @Autowired
+    UserService userService;
+    @Autowired
+     WebApplicationContext context;
+    public static final String PATH="http://localhost:8080";
+    @BeforeEach
+    public void setup()  {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build();
+
+
+    }
+    @Test
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+    public void testSignIn() throws Exception {
+        String email="hamilka540@gmail.com";
+
+        String pass="newPass";
+
+        User userToSave=User.builder()
+                .email("hamilka540@gmail.com")
+                .name("hamilka540")
+                .pass("newPass")
+                .build();
+
+        Mockito.when(userService.findUserByEmailAndPass(email,pass)).thenReturn(userToSave);
+
+        MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post(PATH+AuthenticationController.SIGN_IN_DESTINATION)
+                        .with(csrf())
+                        .param("email",email)
+                        .param("pass",pass)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn()
+                .getResponse();
+
+        log.info(response.getContentAsString());
+
+    }
+    @Test
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+    public void testSignUp() throws Exception {
+
+        User userToSave=User.builder()
+                .email("hamilka540@gmail.com")
+                .name("hamilka540")
+                .pass("newPass")
+                .build();
+
+        Mockito.when(userService.save(userToSave)).thenReturn(userToSave);
+
+        MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post(PATH+ AuthenticationController.SIGN_UP_DESTINATION).with(csrf())
+                        .content(mapper.writeValueAsString(UserFactory.makeUserDto(userToSave)))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn()
+                .getResponse();
+
+        log.info(response.getContentAsString());
+    }
+}
