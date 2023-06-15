@@ -1,6 +1,6 @@
 package com.example.binanceanalizator.Services;
 
-import com.example.binanceanalizator.Models.Dao.InMemory.TickerStatisticsRedis;
+import com.example.binanceanalizator.Models.Entities.InMemory.TickerStatisticsRedis;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

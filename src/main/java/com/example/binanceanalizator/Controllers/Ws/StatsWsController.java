@@ -2,6 +2,7 @@ package com.example.binanceanalizator.Controllers.Ws;
 
 import com.binance.api.client.domain.market.TickerStatistics;
 import com.example.binanceanalizator.Models.Dto.TickerStatisticsDto;
+import com.example.binanceanalizator.Models.SMA;
 import com.example.binanceanalizator.Services.BinanceStatisticsService;
 import com.example.binanceanalizator.Services.RedisOperations;
 import com.example.binanceanalizator.Services.TickerStatisticsService;
@@ -26,23 +27,38 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @RequiredArgsConstructor
 public class StatsWsController {
-public static final String FETCH_BINANCE_STATS="/topic/stats";
+public static final String FETCH_BINANCE_STATS="/topic/stats/ticker_statistics";
+    public static final String FETCH_SMA_STATS="/topic/stats/sma";
 TickerStatisticsService tickerStatisticsService;
 SimpMessagingTemplate messagingTemplate;
 
-public final static long FIXED_RATE=500;
+public final static long FIXED_RATE_FOR_TICKER_STATISTICS=500;
+
+public final static long FIXED_RATE_FOR_SMA=1000;
 
     @SubscribeMapping(FETCH_BINANCE_STATS)
     public Set<TickerStatisticsDto> translateStats(){
         return null;
 }
-@Scheduled(fixedRate = FIXED_RATE)
+
+@SubscribeMapping(FETCH_SMA_STATS)
+public Set<SMA> translateSMA(){
+        return null;
+}
+
+
+@Scheduled(fixedRate = FIXED_RATE_FOR_TICKER_STATISTICS)
 public void sendStatistics(){
 
-Set<TickerStatisticsDto> statsSet=tickerStatisticsService.getLastTickerStatisticsInTimeIntervalFromMemoryDb(FIXED_RATE);
+Set<TickerStatisticsDto> statsSet=tickerStatisticsService.getLastTickerStatisticsInTimeIntervalFromMemoryDb(FIXED_RATE_FOR_TICKER_STATISTICS);
 
 messagingTemplate.convertAndSend(FETCH_BINANCE_STATS,statsSet);
 
-log.info("SCHEDULING : message converted and send with payload : "+statsSet);
+//log.info("SCHEDULING : message converted and send with payload : "+statsSet);
+}
+
+@Scheduled(fixedRate = FIXED_RATE_FOR_SMA)
+    public void sendSMA(){
+
 }
 }

@@ -1,7 +1,6 @@
 package com.example.binanceanalizator.Models.Factories;
 
-import com.example.binanceanalizator.Models.Dao.Embedded.TickerStatistics;
-import com.example.binanceanalizator.Models.Dao.InMemory.TickerStatisticsRedis;
+import com.example.binanceanalizator.Models.Entities.InMemory.TickerStatisticsRedis;
 import com.example.binanceanalizator.Models.Dto.TickerStatisticsDto;
 import org.springframework.stereotype.Component;
 

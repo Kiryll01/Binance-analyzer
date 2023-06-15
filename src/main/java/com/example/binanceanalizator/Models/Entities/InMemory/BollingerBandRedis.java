@@ -1,6 +1,5 @@
-package com.example.binanceanalizator.Models.Dao.InMemory;
+package com.example.binanceanalizator.Models.Entities.InMemory;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

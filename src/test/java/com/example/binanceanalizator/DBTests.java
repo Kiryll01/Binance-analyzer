@@ -1,7 +1,7 @@
 package com.example.binanceanalizator;
 
-import com.example.binanceanalizator.Models.Dao.Embedded.TickerStatistics;
-import com.example.binanceanalizator.Models.Dao.InMemory.TickerStatisticsRedis;
+import com.example.binanceanalizator.Models.Entities.Embedded.TickerStatistics;
+import com.example.binanceanalizator.Models.Entities.InMemory.TickerStatisticsRedis;
 import com.example.binanceanalizator.Services.RedisOperations;
 import com.example.binanceanalizator.Services.TickerStatisticsService;
 import jakarta.persistence.EntityManager;

@@ -1,31 +1,27 @@
-package com.example.binanceanalizator.Models.Dao.InMemory;
+package com.example.binanceanalizator.Models.Entities.Embedded;
 
-import com.example.binanceanalizator.Models.EMA;
-import com.example.binanceanalizator.Models.SMA;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.redis.core.RedisHash;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@RedisHash("binance:moving_average")
-@NoArgsConstructor
-@Data
+@Entity
 @Builder
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MovingAverageRedis {
+public class TickerStatistics {
     @Id
     @Builder.Default
     String id= UUID.randomUUID().toString();
-    SMA sma;
-    EMA ema;
-    double bidPrice;
-
+    String symbol;
+    double averagePriceByCandleStick;
+    double percentChange;
+    double absoluteChange;
     @Builder.Default
     long createdAt= Instant.now().getEpochSecond();
-
 }

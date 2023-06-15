@@ -8,7 +8,7 @@ import com.binance.api.client.domain.event.CandlestickEvent;
 import com.binance.api.client.domain.event.DepthEvent;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.example.binanceanalizator.Properties.BinanceProperties;
-import com.example.binanceanalizator.Models.Dao.InMemory.TickerStatisticsRedis;
+import com.example.binanceanalizator.Models.Entities.InMemory.TickerStatisticsRedis;
 import com.example.binanceanalizator.Models.Factories.TickerStatisticsFactory;
 import com.example.binanceanalizator.Services.BinanceStatisticsService;
 import com.example.binanceanalizator.Services.RedisOperations;
@@ -50,14 +50,14 @@ return client;
            ticker->client.onCandlestickEvent(ticker.toLowerCase(), CandlestickInterval.ONE_MINUTE,this::fetchCandleStickEventData));
    }
     private void fetchCandleStickEventData(CandlestickEvent event){
-       log.info("raw stats : " + event);
+      // log.info("raw stats : " + event);
 
         TickerStatisticsRedis tickerStatisticsRedis =tickerStatisticsService.calculateStatistics(event);
-        log.info("calculated stats : "+ tickerStatisticsRedis);
+       // log.info("calculated stats : "+ tickerStatisticsRedis);
 
       tickerStatisticsService.saveInMemoryDb(tickerStatisticsRedis);
 
-      log.info("stats from redis : " + redisOperations.getLastFromInMemoryDBByKey(TickerStatisticsService.KEY));
+     // log.info("stats from redis : " + redisOperations.getLastFromInMemoryDBByKey(TickerStatisticsService.KEY));
     }
 
 

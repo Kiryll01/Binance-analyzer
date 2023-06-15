@@ -1,8 +1,8 @@
 package com.example.binanceanalizator.Services;
 
 import com.binance.api.client.domain.event.CandlestickEvent;
-import com.example.binanceanalizator.Models.Dao.Embedded.TickerStatistics;
-import com.example.binanceanalizator.Models.Dao.InMemory.TickerStatisticsRedis;
+import com.example.binanceanalizator.Models.Entities.Embedded.TickerStatistics;
+import com.example.binanceanalizator.Models.Entities.InMemory.TickerStatisticsRedis;
 import com.example.binanceanalizator.Models.Dto.TickerStatisticsDto;
 import com.example.binanceanalizator.Models.Factories.TickerStatisticsFactory;
 import com.example.binanceanalizator.repos.TickerStatisticsRepo;

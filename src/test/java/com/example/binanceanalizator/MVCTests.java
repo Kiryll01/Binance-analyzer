@@ -2,13 +2,23 @@ package com.example.binanceanalizator;
 
 import com.binance.api.client.BinanceApiClientFactory;
 import com.binance.api.client.BinanceApiRestClient;
+import com.example.binanceanalizator.Controllers.Rest.AuthenticationController;
 import com.example.binanceanalizator.Controllers.Rest.StatsRestController;
+import com.example.binanceanalizator.Models.Entities.Embedded.User;
+import com.example.binanceanalizator.Models.Entities.Embedded.UserProperties;
+import com.example.binanceanalizator.Models.Entities.Embedded.UserSymbolSubscription;
+import com.example.binanceanalizator.Models.Factories.UserFactory;
 import com.example.binanceanalizator.Models.SMA;
 import com.example.binanceanalizator.Models.SMARequestBody;
 import com.example.binanceanalizator.Services.MovingAverageService;
+import com.example.binanceanalizator.Services.UserService;
+import com.example.binanceanalizator.configs.WebSecurityConfig;
+import com.example.binanceanalizator.repos.UsersRepo;
 import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -19,37 +29,63 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.text.SimpleDateFormat;
 import java.time.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
+import java.util.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static java.time.ZoneOffset.*;
 @Log4j2
-@WebMvcTest(StatsRestController.class)
+@WebMvcTest({StatsRestController.class, AuthenticationController.class})
 @AutoConfigureMockMvc
+@ComponentScan({"com.example.binanceanalizator.Controllers.Rest"})
+//@Import(WebSecurityConfig.class)
 public class MVCTests {
     @Autowired
     MockMvc mockMvc;
     ObjectMapper mapper=new ObjectMapper();
     @MockBean
     MovingAverageService movingAverageService;
-
+    @MockBean
+    UserService userService;
+    @Autowired
+    private WebApplicationContext context;
   public static final String PATH="http://localhost:8080";
+    @BeforeEach
+    public void setup()  {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build();
+
+
+    }
     @Test
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
     public void testSmaRequest() throws Exception {
 
        String startTime="2023-04-13 00:00:00";
