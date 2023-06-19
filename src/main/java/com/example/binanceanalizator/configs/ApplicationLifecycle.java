@@ -4,6 +4,7 @@ import com.binance.api.client.BinanceApiRestClient;
 import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.example.binanceanalizator.Models.Entities.InMemory.TickerStatisticsRedis;
+import com.example.binanceanalizator.Models.UserPrincipal;
 import com.example.binanceanalizator.Properties.BinanceProperties;
 import com.example.binanceanalizator.Services.RedisOperations;
 import com.example.binanceanalizator.Services.TickerStatisticsService;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -28,10 +30,22 @@ public class ApplicationLifecycle {
     BinanceProperties properties;
     TickerStatisticsService  tickerStatisticsService;
     RedisOperations redisOperations;
+    PasswordEncoder encoder;
+
     //TODO: be careful, because all data is cleaned up at the start of application
+
+@PostConstruct
+public void setStaticEncoder(){
+
+    UserPrincipal.setEncoder(encoder);
+
+    log.info("encoder set successfully to UserPrincipal");
+
+}
     @PostConstruct
     public void CleanAndFillRedisData(){
-redisTemplate.getConnectionFactory().getConnection().flushAll();
+
+        redisTemplate.getConnectionFactory().getConnection().flushAll();
 
     log.warn("redis is cleaned");
 

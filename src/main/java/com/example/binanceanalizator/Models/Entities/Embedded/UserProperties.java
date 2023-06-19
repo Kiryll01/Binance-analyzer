@@ -16,6 +16,9 @@ public class UserProperties {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+    String Role;
     @OneToOne(mappedBy = "userProperties")
     User user;
+    
+
 }

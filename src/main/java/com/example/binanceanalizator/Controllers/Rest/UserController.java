@@ -13,8 +13,8 @@ import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
@@ -23,10 +23,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     UserService userService;
     public static final String GET_ACCOUNT_INFORMATION="/api/user/account/information";
+    public static final String SET_ACCOUNT_INFORMATION="/api/user/account/edit";
     @GetMapping(GET_ACCOUNT_INFORMATION)
     public ResponseEntity<UserDto> getAccountInformation(Authentication authentication)throws UsernameNotFoundException {
        UserPrincipal userPrincipal=(UserPrincipal) userService.loadUserByUsername (authentication.getName());
     return ResponseEntity.ok()
             .body(UserFactory.makeUserDto(userPrincipal.getUser()));
+    }
+    //Todo: implement;
+    @PutMapping(SET_ACCOUNT_INFORMATION)
+    public ResponseEntity<?> setAccountInformation(@RequestBody UserDto userDto, BindingResult bindingResult,
+                                                   Authentication authentication){
+
+        UserPrincipal userPrincipal= (UserPrincipal) authentication.getPrincipal();
+
+        return null;
+
+
+        //userService.findUserByEmailAndPass(userDto.getEmail(), userDto.getPass());
+
     }
 }

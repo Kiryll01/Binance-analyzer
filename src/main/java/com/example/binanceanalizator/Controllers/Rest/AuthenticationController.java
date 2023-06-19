@@ -3,38 +3,30 @@ package com.example.binanceanalizator.Controllers.Rest;
 import com.example.binanceanalizator.Controllers.ErrorHandlingUtils;
 import com.example.binanceanalizator.Models.Dto.UserDto;
 import com.example.binanceanalizator.Models.Entities.Embedded.User;
+import com.example.binanceanalizator.Models.Entities.Embedded.UserProperties;
 import com.example.binanceanalizator.Models.Factories.UserFactory;
+import com.example.binanceanalizator.Models.Roles;
+import com.example.binanceanalizator.Models.UserPrincipal;
 import com.example.binanceanalizator.Services.UserService;
-import com.example.binanceanalizator.repos.UsersRepo;
-import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.io.Resource;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.RepresentationModelAssembler;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
@@ -43,16 +35,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 public class AuthenticationController {
     AuthenticationProvider authenticationProvider;
     UserService userService;
-    PasswordEncoder encoder;
     public static final String SIGN_UP_DESTINATION="/api/user/authentication/sign_up";
     public static final String SIGN_IN_DESTINATION="/api/user/authentication/sign_in";
 
     @PostMapping(SIGN_UP_DESTINATION)
-    public ResponseEntity<?> signUp(@Validated @RequestBody UserDto user, BindingResult bindingResult)  {
-//        if(bindingResult.hasErrors())
-//            throw new ValidationException(bindingResult.getAllErrors(),user.getClass(),"wrong data");
+    public ResponseEntity<?> signUp(@Validated @RequestBody UserDto user, BindingResult bindingResult,@Header String simpSessionId)  {
 
-       //log.info(user);
+        user.setUserProperties(UserProperties.builder().Role(Roles.RAW_USER.getValue()).build());
 
         if(bindingResult.hasErrors()) return ErrorHandlingUtils.returnBindingResultEntity(bindingResult);
 
@@ -64,7 +53,7 @@ if(userService.findUserByName(user.getName())!=null) return ResponseEntity.badRe
 
         EntityModel<UserDto> userModel=
                 EntityModel.of(user,linkTo(methodOn(AuthenticationController.class)
-                        .signIn(user.getEmail(), user.getPass())).withRel(AuthenticationController.SIGN_IN_DESTINATION));
+                        .signIn(user.getEmail(), user.getPass(),simpSessionId)).withRel(AuthenticationController.SIGN_IN_DESTINATION));
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -72,27 +61,51 @@ if(userService.findUserByName(user.getName())!=null) return ResponseEntity.badRe
 
     }
 @PostMapping(SIGN_IN_DESTINATION)
-    public ResponseEntity<?> signIn(@RequestParam String email, @RequestParam String pass ){
+    public ResponseEntity<?> signIn(@RequestParam String email, @RequestParam String pass, @Header String simpSessionId){
 
         User user = userService.findUserByEmailAndPass(email,pass);
 
-        if(user==null) return ResponseEntity.notFound().build();
+        if(user==null) return ResponseEntity.badRequest().body(email+" "+ pass+ " not found");
 
-   UserDto userDto=UserFactory.makeUserDto(user);
+    setAuthentication(user);
 
-    Authentication authentication=authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(user.getName(),encoder.encode(user.getPass())));
+    userService.saveInMemory(UserFactory.makeRedisUser(UserFactory.makeUserDto(user),simpSessionId));
 
-     SecurityContextHolder.getContext().setAuthentication(authentication);
+    UserPrincipal userPrincipal = (UserPrincipal) getAuthentication().getPrincipal();
+
+    UserDto userDto=UserFactory.makeUserDto(userPrincipal.getUser());
 
     EntityModel<UserDto> userModel=
-            EntityModel.of(userDto,linkTo(methodOn(AuthenticationController.class).signIn(email, pass)).withSelfRel());
-                 //   linkTo(methodOn(UserController.class).getAccountInformation(authentication)).withRel(UserController.GET_ACCOUNT_INFORMATION));
+            EntityModel.of(userDto,linkTo(methodOn(AuthenticationController.class).signIn(email, pass,simpSessionId)).withSelfRel());
 
+    HttpHeaders headers = setHeaders(userPrincipal);
 
-   return ResponseEntity.ok()
+    return ResponseEntity.ok()
            .contentType(MediaType.APPLICATION_JSON)
+           .headers(headers)
            .body(userModel);
 }
+
+    @NotNull
+    private HttpHeaders setHeaders(UserPrincipal userPrincipal) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.add("User-Agent", userPrincipal.getUsername() );
+        headers.add("Authorization", "Bearer "+ userPrincipal.getPassword() );
+        return headers;
+    }
+
+    private Authentication getAuthentication() {
+         return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    private void setAuthentication(User user) {
+        Authentication authentication=authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(user.getName(), user.getPass()));
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+    }
 
 
 //@ExceptionHandler(ValidationException.class)

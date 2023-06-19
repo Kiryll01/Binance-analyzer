@@ -15,7 +15,7 @@ import java.util.List;
 @Log4j2
 @FieldDefaults(makeFinal = true,level = AccessLevel.PRIVATE)
 public class RedisOperations {
-    RedisTemplate<String, TickerStatisticsRedis> redisTemplate;
+    RedisTemplate<String, Object> redisTemplate;
     public Object getLastFromInMemoryDBByKey(String key){
         int size= Math.toIntExact(redisTemplate.opsForHash().size(key));
         return  redisTemplate

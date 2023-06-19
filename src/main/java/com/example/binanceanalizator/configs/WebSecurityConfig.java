@@ -1,14 +1,17 @@
 package com.example.binanceanalizator.configs;
 
 import com.example.binanceanalizator.Controllers.Rest.AuthenticationController;
+import com.example.binanceanalizator.Models.Entities.InMemory.RedisUser;
 import com.example.binanceanalizator.Services.UserService;
 import com.example.binanceanalizator.repos.UsersRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
@@ -35,9 +38,10 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 
     private final UsersRepo usersRepo;
+    private final RedisTemplate<String, RedisUser> redisTemplate;
     @Bean
     public UserDetailsService userDetailsService() {
-        return new UserService(usersRepo);
+        return new UserService(usersRepo,redisTemplate);
     }
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {

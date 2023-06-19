@@ -1,22 +1,34 @@
 package com.example.binanceanalizator.Models;
 
+import com.binance.api.client.domain.market.CandlestickInterval;
 import com.example.binanceanalizator.Models.Entities.Embedded.User;
 import com.example.binanceanalizator.Models.Entities.Embedded.UserSymbolSubscription;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.hibernate.query.sqm.IntervalType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@AllArgsConstructor
 @Data
 public class UserPrincipal implements UserDetails {
+    public UserPrincipal(User user) {
+        this.user = user;
+    }
     private User user;
+    public static void setEncoder(PasswordEncoder encoder) {
+        UserPrincipal.encoder = encoder;
+    }
+
+    private static PasswordEncoder encoder;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities=new ArrayList<>();
@@ -28,7 +40,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getPassword() {
-      return user.getPass();
+      return encoder.encode(user.getPass());
     }
 
     @Override
