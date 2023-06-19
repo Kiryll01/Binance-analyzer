@@ -2,7 +2,9 @@ package com.example.binanceanalizator.Models.Factories;
 
 import com.example.binanceanalizator.Models.Dto.UserDto;
 import com.example.binanceanalizator.Models.Entities.Embedded.User;
+import com.example.binanceanalizator.Models.Entities.Embedded.UserPropertiesEntity;
 import com.example.binanceanalizator.Models.Entities.InMemory.RedisUser;
+import com.example.binanceanalizator.Models.UserProperties;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -35,8 +37,13 @@ public class UserFactory {
                         .stream()
                         .map(userSymbolSubscription -> userSymbolSubscription.getSymbolName())
                         .collect(Collectors.toSet()))
-                .role(userDto.getUserProperties().getRole())
+                .userProperties(makeUserProperties(userDto.getUserProperties()))
                 .simpSessionId(simpSessionId)
+                .build();
+    }
+    public static UserProperties makeUserProperties(UserPropertiesEntity userProperties){
+        return UserProperties.builder()
+                .role(userProperties.getRole())
                 .build();
     }
 }

@@ -27,41 +27,49 @@ import java.util.List;
 public class UserService implements UserDetailsService {
 UsersRepo usersRepo;
 RedisTemplate<String, RedisUser> userRedisTemplate;
-HashOperations<String,String,RedisUser> userHashOperations = userRedisTemplate.opsForHash();
+HashOperations<String,String,RedisUser> userHashOperations;
 HashOperations<String,String, IdSimpSessionIdUser> idHashOperations;
 public static final String USERS_KEY ="binance:users";
-public static final String USER_IDS_KEY ="binance:user:ids";
+public static final String USER_IDS_KEY ="binance:users:ids";
 @EventListener
 public void afterAuthenticationSuccess(AuthenticationSuccessEvent event){
     log.info(event.getAuthentication().getName());
 }
+
 public Integer deleteUserByEmailAndPass(String email,String pass){
    return usersRepo.deleteUserByEmailAndPass(email,pass);
 }
+
 public User save(User user){
     return usersRepo.save(user);
 }
+
 public User findUserByEmailAndPass(String email,String pass){
    return usersRepo.findUserByEmailAndPass(email,pass);
 }
+
 public User findUserByName(String name){
     return usersRepo.findUserByName(name);
 }
+
 public void saveInMemory(RedisUser user){
     userHashOperations.put(USERS_KEY,user.getId(),user);
     IdSimpSessionIdUser idSimpSessionIdUser=new IdSimpSessionIdUser(user.getSimpSessionId(), user.getId());
     idHashOperations.put(USER_IDS_KEY, idSimpSessionIdUser.getSimpSessionId(),idSimpSessionIdUser);
 }
-public List<RedisUser> getAllFromInMemoryDb(){
+
+    public List<RedisUser> getAllFromInMemoryDb(){
         return userHashOperations.values(USERS_KEY);
     }
     public RedisUser getUserByIdFromInMemory(String id){
    return userHashOperations.get(USERS_KEY,id);
 }
-public RedisUser getUserBySimpSessionId(String simpSessionId){
-String id=idHashOperations.get(USER_IDS_KEY,simpSessionId).getId();
-return getUserByIdFromInMemory(id);
+
+    public RedisUser getUserBySimpSessionId(String simpSessionId){
+    String id=idHashOperations.get(USER_IDS_KEY,simpSessionId).getId();
+    return getUserByIdFromInMemory(id);
 }
+
 @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user=findUserByName(username);

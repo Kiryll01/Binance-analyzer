@@ -3,7 +3,7 @@ package com.example.binanceanalizator.Controllers.Rest;
 import com.example.binanceanalizator.Controllers.ErrorHandlingUtils;
 import com.example.binanceanalizator.Models.Dto.UserDto;
 import com.example.binanceanalizator.Models.Entities.Embedded.User;
-import com.example.binanceanalizator.Models.Entities.Embedded.UserProperties;
+import com.example.binanceanalizator.Models.Entities.Embedded.UserPropertiesEntity;
 import com.example.binanceanalizator.Models.Factories.UserFactory;
 import com.example.binanceanalizator.Models.Roles;
 import com.example.binanceanalizator.Models.UserPrincipal;
@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,6 +34,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @RequiredArgsConstructor
 @Log4j2
 public class AuthenticationController {
+    AuthenticationEventPublisher authenticationEventPublisher;
     AuthenticationProvider authenticationProvider;
     UserService userService;
     public static final String SIGN_UP_DESTINATION="/api/user/authentication/sign_up";
@@ -41,7 +43,7 @@ public class AuthenticationController {
     @PostMapping(SIGN_UP_DESTINATION)
     public ResponseEntity<?> signUp(@Validated @RequestBody UserDto user, BindingResult bindingResult,@Header String simpSessionId)  {
 
-        user.setUserProperties(UserProperties.builder().role(Roles.RAW_USER.getValue()).build());
+        user.setUserProperties(UserPropertiesEntity.builder().role(Roles.RAW_USER.getValue()).build());
 
         if(bindingResult.hasErrors()) return ErrorHandlingUtils.returnBindingResultEntity(bindingResult);
 
@@ -71,7 +73,9 @@ if(userService.findUserByName(user.getName())!=null) return ResponseEntity.badRe
 
     userService.saveInMemory(UserFactory.makeRedisUser(UserFactory.makeUserDto(user),simpSessionId));
 
-    UserPrincipal userPrincipal = (UserPrincipal) getAuthentication().getPrincipal();
+    Authentication authentication=getAuthentication();
+
+    UserPrincipal userPrincipal = (UserPrincipal)authentication.getPrincipal();
 
     UserDto userDto=UserFactory.makeUserDto(userPrincipal.getUser());
 
@@ -79,6 +83,8 @@ if(userService.findUserByName(user.getName())!=null) return ResponseEntity.badRe
             EntityModel.of(userDto,linkTo(methodOn(AuthenticationController.class).signIn(email, pass,simpSessionId)).withSelfRel());
 
     HttpHeaders headers = setHeaders(userPrincipal);
+
+    authenticationEventPublisher.publishAuthenticationSuccess(authentication);
 
     return ResponseEntity.ok()
            .contentType(MediaType.APPLICATION_JSON)

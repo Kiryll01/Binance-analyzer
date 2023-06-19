@@ -41,6 +41,7 @@ public class UserController {
 
        RedisUser redisUser= userService.getUserBySimpSessionId(simpSessionId);
 
+
        //redisUser.setRole();
 return null;
       //  UserPrincipal userPrincipal= (UserPrincipal) authentication.getPrincipal();

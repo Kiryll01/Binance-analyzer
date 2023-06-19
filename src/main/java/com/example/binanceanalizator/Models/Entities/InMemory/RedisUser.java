@@ -1,5 +1,6 @@
 package com.example.binanceanalizator.Models.Entities.InMemory;
 
+import com.example.binanceanalizator.Models.UserProperties;
 import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -22,8 +23,9 @@ public class RedisUser implements Serializable {
     String id= UUID.randomUUID().toString();
     String name;
     Set<String> symbols;
-    String role;
+    UserProperties userProperties;
     String simpSessionId;
+    MovingAverageProperties movingAverageProperties;
     @Builder.Default
     long createdAt= Instant.now().getEpochSecond();
 }

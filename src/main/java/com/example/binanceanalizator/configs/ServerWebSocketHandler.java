@@ -1,14 +1,10 @@
 package com.example.binanceanalizator.configs;
 
 import com.example.binanceanalizator.Controllers.Ws.StatsWsController;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.util.HtmlUtils;
 
@@ -27,7 +23,7 @@ public class ServerWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        String subscriptionMessage = "{\"subscribe\":"+StatsWsController.FETCH_BINANCE_STATS+"\"}\"";
+        String subscriptionMessage = "{\"subscribe\":"+StatsWsController.FETCH_TICKER_STATS +"\"}\"";
         TextMessage message = new TextMessage(subscriptionMessage);
         session.sendMessage(message);
     }

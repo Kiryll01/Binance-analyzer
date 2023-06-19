@@ -1,13 +1,10 @@
 package com.example.binanceanalizator.Models.Entities.Embedded;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -24,7 +21,7 @@ String pass;
 String email;
 @OneToOne
 @JoinColumn(name = "user_properties_id")
-UserProperties userProperties;
+UserPropertiesEntity userProperties;
 @ManyToMany
 Set<UserSymbolSubscription> userSymbolSubscriptions;
 

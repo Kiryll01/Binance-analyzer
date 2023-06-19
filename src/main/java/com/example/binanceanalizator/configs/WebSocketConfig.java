@@ -14,10 +14,11 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public static final String REGISTRY="/ws";
     public static final String TOPIC_DESTINATION_PREFIX="/topic";
+    public static final String QUEUE_DESTINATION_PREFIX="/queue";
     public static final String APPLICATION_DESTINATION_PREFIX="/app";
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker(TOPIC_DESTINATION_PREFIX);
+        config.enableSimpleBroker(TOPIC_DESTINATION_PREFIX,QUEUE_DESTINATION_PREFIX);
         config.setApplicationDestinationPrefixes(APPLICATION_DESTINATION_PREFIX);
     }
 

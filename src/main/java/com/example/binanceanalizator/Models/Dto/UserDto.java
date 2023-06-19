@@ -1,6 +1,7 @@
 package com.example.binanceanalizator.Models.Dto;
 
-import com.example.binanceanalizator.Models.Entities.Embedded.UserProperties;
+import com.example.binanceanalizator.Models.AbstractUserProperties;
+import com.example.binanceanalizator.Models.Entities.Embedded.UserPropertiesEntity;
 import com.example.binanceanalizator.Models.Entities.Embedded.UserSymbolSubscription;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
@@ -22,7 +23,7 @@ public class UserDto {
     @Email
     String email;
     @Nullable
-    UserProperties userProperties;
+    UserPropertiesEntity userProperties;
     @Nullable
     Set<UserSymbolSubscription> userSymbolSubscriptions;
 }
