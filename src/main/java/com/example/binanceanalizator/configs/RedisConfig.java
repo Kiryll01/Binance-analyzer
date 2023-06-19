@@ -26,15 +26,19 @@ public class RedisConfig {
     return new JedisConnectionFactory(redisConfiguration);
 }
 @Bean
-   public <S>RedisTemplate<String, S> redisTemplate() {
-    RedisTemplate<String, S> redisTemplate = new RedisTemplate<>();
+   public <V>RedisTemplate<String, V> redisTemplate() {
+    RedisTemplate<String, V> redisTemplate = new RedisTemplate<>();
     redisTemplate.setConnectionFactory(jedisConnectionFactory());
     redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
     redisTemplate.setKeySerializer(new StringRedisSerializer());
     redisTemplate.afterPropertiesSet();
     return redisTemplate;
 }
-
+@Bean
+@Autowired
+public <V> HashOperations<String,String,V> hashOperations(RedisTemplate<String,V> redisTemplate){
+    return redisTemplate.opsForHash();
+}
 
 
 }

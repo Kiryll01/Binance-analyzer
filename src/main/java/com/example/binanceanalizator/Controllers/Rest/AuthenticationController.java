@@ -41,7 +41,7 @@ public class AuthenticationController {
     @PostMapping(SIGN_UP_DESTINATION)
     public ResponseEntity<?> signUp(@Validated @RequestBody UserDto user, BindingResult bindingResult,@Header String simpSessionId)  {
 
-        user.setUserProperties(UserProperties.builder().Role(Roles.RAW_USER.getValue()).build());
+        user.setUserProperties(UserProperties.builder().role(Roles.RAW_USER.getValue()).build());
 
         if(bindingResult.hasErrors()) return ErrorHandlingUtils.returnBindingResultEntity(bindingResult);
 

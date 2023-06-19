@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.UUID;
-
 @Entity
 @AllArgsConstructor
 @Data
@@ -16,7 +14,7 @@ public class UserProperties {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String Role;
+    String role;
     @OneToOne(mappedBy = "userProperties")
     User user;
     
