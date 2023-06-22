@@ -8,6 +8,7 @@ import com.example.binanceanalizator.Models.Factories.UserFactory;
 import com.example.binanceanalizator.Models.Roles;
 import com.example.binanceanalizator.Models.UserPrincipal;
 import com.example.binanceanalizator.Services.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -41,7 +42,7 @@ public class AuthenticationController {
     public static final String SIGN_IN_DESTINATION="/api/user/authentication/sign_in";
 
     @PostMapping(SIGN_UP_DESTINATION)
-    public ResponseEntity<?> signUp(@Validated @RequestBody UserDto user, BindingResult bindingResult,@Header String simpSessionId)  {
+    public ResponseEntity<?> signUp(@Validated @RequestBody UserDto user, BindingResult bindingResult,HttpSession httpSession)  {
 
         user.setUserProperties(UserPropertiesEntity.builder().role(Roles.RAW_USER.getValue()).build());
 
@@ -55,7 +56,7 @@ if(userService.findUserByName(user.getName())!=null) return ResponseEntity.badRe
 
         EntityModel<UserDto> userModel=
                 EntityModel.of(user,linkTo(methodOn(AuthenticationController.class)
-                        .signIn(user.getEmail(), user.getPass(),simpSessionId)).withRel(AuthenticationController.SIGN_IN_DESTINATION));
+                        .signIn(user.getEmail(), user.getPass(),httpSession)).withRel(AuthenticationController.SIGN_IN_DESTINATION));
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -63,7 +64,7 @@ if(userService.findUserByName(user.getName())!=null) return ResponseEntity.badRe
 
     }
 @PostMapping(SIGN_IN_DESTINATION)
-    public ResponseEntity<?> signIn(@RequestParam String email, @RequestParam String pass, @Header String simpSessionId){
+    public ResponseEntity<?> signIn(@RequestParam String email, @RequestParam String pass, HttpSession httpSession){
 
         User user = userService.findUserByEmailAndPass(email,pass);
 
@@ -71,7 +72,7 @@ if(userService.findUserByName(user.getName())!=null) return ResponseEntity.badRe
 
     setAuthentication(user);
 
-    userService.saveInMemory(UserFactory.makeRedisUser(UserFactory.makeUserDto(user),simpSessionId));
+    userService.saveInMemory(UserFactory.makeRedisUser(UserFactory.makeUserDto(user),httpSession.getId()));
 
     Authentication authentication=getAuthentication();
 
@@ -80,7 +81,7 @@ if(userService.findUserByName(user.getName())!=null) return ResponseEntity.badRe
     UserDto userDto=UserFactory.makeUserDto(userPrincipal.getUser());
 
     EntityModel<UserDto> userModel=
-            EntityModel.of(userDto,linkTo(methodOn(AuthenticationController.class).signIn(email, pass,simpSessionId)).withSelfRel());
+            EntityModel.of(userDto,linkTo(methodOn(AuthenticationController.class).signIn(email, pass,httpSession)).withSelfRel());
 
     HttpHeaders headers = setHeaders(userPrincipal);
 

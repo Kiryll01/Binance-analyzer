@@ -2,8 +2,12 @@ package com.example.binanceanalizator;
 
 import com.example.binanceanalizator.Controllers.Rest.AuthenticationController;
 import com.example.binanceanalizator.Controllers.Rest.StatsRestController;
+import com.example.binanceanalizator.Controllers.Rest.UserController;
+import com.example.binanceanalizator.Models.Dto.UserDto;
+import com.example.binanceanalizator.Models.Entities.Embedded.UserSymbolSubscription;
 import com.example.binanceanalizator.Models.SMA;
 import com.example.binanceanalizator.Models.SMARequestBody;
+import com.example.binanceanalizator.Models.UserProperties;
 import com.example.binanceanalizator.Services.MovingAverageService;
 import com.example.binanceanalizator.Services.UserService;
 import lombok.extern.log4j.Log4j2;
@@ -21,11 +25,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.text.SimpleDateFormat;
@@ -37,6 +43,7 @@ import java.util.*;
 @ComponentScan({"com.example.binanceanalizator.Controllers.Rest"})
 //@Import(WebSecurityConfig.class)
 public class MVCTests {
+    UserDto userDto;
     @Autowired
     MockMvc mockMvc;
     ObjectMapper mapper=new ObjectMapper();
@@ -49,12 +56,33 @@ public class MVCTests {
   public static final String PATH="http://localhost:8080";
     @BeforeEach
     public void setup()  {
+        userDto=UserDto
+                .builder()
+                .name("kiryll")
+                .email("tarnokiryll@outlook.com")
+                .pass("passHuiNapass")
+                .userProperties(null)
+                .userSymbolSubscriptions(new HashSet<>(Set.of(new UserSymbolSubscription())))
+                .build();
+
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
 
 
+    }
+    @Test
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+public void testPutSettingsRequest() throws Exception {
+
+       MockHttpServletResponse response= mockMvc.perform(MockMvcRequestBuilders.put(PATH+UserController.SET_ACCOUNT_INFORMATION).contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(userDto)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn()
+                .getResponse();
+
+       log.info(response.getContentAsString());
     }
     @Test
     @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})

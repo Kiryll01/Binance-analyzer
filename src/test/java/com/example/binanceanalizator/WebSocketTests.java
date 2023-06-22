@@ -20,6 +20,7 @@ import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -41,6 +42,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureMockMvc
+@WithMockUser
 public class WebSocketTests {
 
     @Value("${local.server.port}")
@@ -90,7 +92,8 @@ public class WebSocketTests {
     //test scheduling with calculate method
     @SneakyThrows
     @Test
-    public void SchedulingTest() {
+    public void tickerStatsSchedulingTest() {
+
          RunStopFrameHandler handler=client.getHandler();
 
          StompSession stompSession= client.getStompSession();
@@ -106,8 +109,23 @@ public class WebSocketTests {
         params.stream().forEach(System.out::println);
     }
 
+@Test
+@SneakyThrows
+public void smaSchedulingTest(){
+    RunStopFrameHandler handler=client.getHandler();
 
+    StompSession stompSession= client.getStompSession();
 
+    stompSession.subscribe(StatsWsController.FETCH_SMA_STATS,handler);
+
+    Thread.sleep(5000);
+
+    byte[] payload= (byte[]) handler.getFuture().get();
+
+    Set<LinkedHashMap<String, Object>> params=(Set<LinkedHashMap<String, Object>>)mapper.readValue(payload, Set.class);
+
+    params.stream().forEach(System.out::println);
+    }
     private List<Transport> createTransportClient() {
 
         List<Transport> transports = new ArrayList<>(1);

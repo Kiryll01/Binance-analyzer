@@ -5,12 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
-public abstract class AbstractMovingAverageProperties {
-    long millisInterval;
-    long startTime;
-    long endTime;
+@SuperBuilder(toBuilder = true)
+public abstract class AbstractMovingAverageProperties implements Serializable {
+    long shortMillisInterval;
+    long longMillisInterval;
 }

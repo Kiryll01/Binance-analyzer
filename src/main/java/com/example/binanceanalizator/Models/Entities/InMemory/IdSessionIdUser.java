@@ -4,7 +4,6 @@ import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.redis.core.RedisHash;
 
@@ -14,9 +13,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class IdSimpSessionIdUser implements Serializable {
+public class IdSessionIdUser implements Serializable {
     @Id
-    String simpSessionId;
+    String sessionId;
 String id;
 
 }

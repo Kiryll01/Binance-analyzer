@@ -3,6 +3,7 @@ package com.example.binanceanalizator;
 import com.example.binanceanalizator.Controllers.Rest.AuthenticationController;
 import com.example.binanceanalizator.Controllers.Rest.StatsRestController;
 import com.example.binanceanalizator.Models.Entities.Embedded.User;
+import com.example.binanceanalizator.Models.Entities.Embedded.UserPropertiesEntity;
 import com.example.binanceanalizator.Models.Factories.UserFactory;
 import com.example.binanceanalizator.Services.MovingAverageService;
 import com.example.binanceanalizator.Services.UserService;
@@ -34,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.HashSet;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
@@ -62,10 +65,14 @@ public class MVCAuthenticationTests {
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
 
+        //UserPropertiesEntity.builder()
+
         User userToSave=User.builder()
                 .email("hamilka540@gmail.com")
                 .name("hamilka540")
                 .pass("newPass")
+                .userSymbolSubscriptions(new HashSet<>())
+                .userProperties(new UserPropertiesEntity())
                 .build();
 
         userService.save(userToSave);
@@ -90,6 +97,8 @@ public class MVCAuthenticationTests {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn()
                 .getResponse();
+
+       log.info( userService.getAllFromInMemoryDb());
 
         log.info(response.getContentAsString());
 

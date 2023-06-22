@@ -1,12 +1,14 @@
-package com.example.binanceanalizator.Controllers.Rest;
+package com.example.binanceanalizator.Models.ValidationUtils;
 
 
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.validation.ObjectError;
 
 import java.util.List;
 
 @Getter
+@ToString
 public class ValidationException extends Exception {
     private List<ObjectError> errors;
     private Class<?> clazz;

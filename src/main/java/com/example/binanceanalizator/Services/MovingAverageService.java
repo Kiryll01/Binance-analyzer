@@ -42,23 +42,9 @@ public List<SMA> calculateSMAForAPeriod(String symbol,long millisInterval, Long 
 
    int smaPeriod;
 
-//   int smaLongPeriod;
-//
-//   if (closePrices.size() <= 1) return new ArrayList<>();
-//
-//   if (closePrices.size() < 10) smaPeriod = 2;
-//
-//   if (closePrices.size() < 60) smaPeriod = 3;
-//
-//   else smaPeriod = closePrices.size() / 20;
-//
-//   smaLongPeriod = smaPeriod * 3;
-
    smaPeriod =closePrices.size()/20;
 
    List<Double> smaAverages= calculateSimpleAverages(closePrices,smaPeriod);
-
-   //List<Double> smaLongAverages = calculateSimpleAverages(closePrices,smaLongPeriod);
 
    List<SMA> smaList=new ArrayList<>();
 

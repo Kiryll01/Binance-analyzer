@@ -12,11 +12,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -59,27 +61,42 @@ messagingTemplate.convertAndSend(FETCH_TICKER_STATS,statsSet);
 //Todo: send stats to all users depending on their properties;
 @Scheduled(fixedRate = FIXED_RATE_FOR_SMA)
     public void sendSMA(){
+
 userService.getAllFromInMemoryDb().stream()
         .filter(user -> checkRole(user.getUserProperties().getRole()))
         .forEach(user ->
         user.getSymbols().forEach(s->
-            sendSMAToUser(user, s)));
+                calculateAndSendSMAToUser(user, s)));
     }
 
-    private void sendSMAToUser(RedisUser user, String s) {
-        List<SMA> sma= calculateSMAForSymbol(user, s);
-        messagingTemplate.convertAndSend(getDestination(user),sma);
+    private void calculateAndSendSMAToUser(RedisUser user, String symbol) {
+
+      long shortMillisInterval = user.getMovingAverageProperties().getShortMillisInterval();
+
+      long longMillisInterval=user.getMovingAverageProperties().getLongMillisInterval();
+
+      long endTime=Instant.now().getEpochSecond();
+
+        List<SMA> shortSma= movingAverageService.calculateSMAForAPeriod(symbol,
+        user.getMovingAverageProperties().getShortMillisInterval(),
+                endTime-shortMillisInterval*50,
+                endTime);
+
+        List<SMA> longSma=movingAverageService.calculateSMAForAPeriod(symbol,
+                user.getMovingAverageProperties().getLongMillisInterval(),
+                endTime-longMillisInterval*50,
+                endTime);
+
+        messagingTemplate.convertAndSend(getDestination(user.getSessionId()),shortSma);
+
+        messagingTemplate.convertAndSend(getDestination(user.getSessionId()),longSma);
+
     }
 
-    private List<SMA> calculateSMAForSymbol(RedisUser user,String symbol){
-       return movingAverageService.calculateSMAForAPeriod(symbol,
-                user.getMovingAverageProperties().getMillisInterval(),
-                user.getMovingAverageProperties().getStartTime(),
-                user.getMovingAverageProperties().getEndTime());
-}
+
     @NotNull
-    private static String getDestination(RedisUser user) {
-        return FETCH_SMA_STATS.replace("{user_id}", user.getSimpSessionId());
+    private static String getDestination(String sessionId) {
+        return FETCH_SMA_STATS.replace("{user_id}", sessionId);
     }
 
     public boolean checkRole(String role){

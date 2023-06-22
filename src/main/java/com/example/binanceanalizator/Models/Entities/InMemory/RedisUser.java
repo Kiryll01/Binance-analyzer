@@ -24,7 +24,7 @@ public class RedisUser implements Serializable {
     String name;
     Set<String> symbols;
     UserProperties userProperties;
-    String simpSessionId;
+    String sessionId;
     MovingAverageProperties movingAverageProperties;
     @Builder.Default
     long createdAt= Instant.now().getEpochSecond();

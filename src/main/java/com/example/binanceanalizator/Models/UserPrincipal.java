@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -31,11 +32,7 @@ public class UserPrincipal implements UserDetails {
     private static PasswordEncoder encoder;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities=new ArrayList<>();
-        for(UserSymbolSubscription symbolSubscription:user.getUserSymbolSubscriptions()){
-        authorities.add(new SimpleGrantedAuthority(symbolSubscription.getSymbolName()));
-        }
-        return authorities;
+      return Collections.singletonList(new SimpleGrantedAuthority(user.getUserProperties().getRole()));
     }
 
     @Override

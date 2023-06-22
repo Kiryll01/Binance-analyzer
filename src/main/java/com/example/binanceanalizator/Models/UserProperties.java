@@ -1,8 +1,18 @@
 package com.example.binanceanalizator.Models;
 
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-@SuperBuilder
-public class UserProperties extends AbstractUserProperties{
+import java.io.Serializable;
+
+@SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Getter
+@Setter
+public class UserProperties extends AbstractUserProperties implements Serializable {
+    public UserProperties(String role) {
+        super(role);
+    }
 
 }

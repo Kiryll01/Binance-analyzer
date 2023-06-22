@@ -38,16 +38,6 @@ public class StatsRestController {
     @GetMapping("/SMA")
     public ResponseEntity<List<SMA>> getSMAForAPeriod(@Valid @RequestBody SMARequestBody smaRequestBody) throws ParseException {
 
-//        if(bindingResult.hasErrors()){
-//            List<ObjectError> errors=bindingResult.getAllErrors();
-//            HttpHeaders httpHeaders=new HttpHeaders();
-//            errors.forEach(error->httpHeaders.add(error.getObjectName(), String.valueOf(error)));
-//            return ResponseEntity.badRequest()
-//                    .contentType(MediaType.APPLICATION_JSON)
-//                    .headers(httpHeaders)
-//                    .body(null);
-//        }
-
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat(format);
 
     long start = simpleDateFormat.parse(smaRequestBody.getStartTime()).getTime();

@@ -1,7 +1,7 @@
 package com.example.binanceanalizator.Services;
 
 import com.example.binanceanalizator.Models.Entities.Embedded.User;
-import com.example.binanceanalizator.Models.Entities.InMemory.IdSimpSessionIdUser;
+import com.example.binanceanalizator.Models.Entities.InMemory.IdSessionIdUser;
 import com.example.binanceanalizator.Models.Entities.InMemory.RedisUser;
 import com.example.binanceanalizator.Models.UserPrincipal;
 import com.example.binanceanalizator.repos.UsersRepo;
@@ -28,7 +28,7 @@ public class UserService implements UserDetailsService {
 UsersRepo usersRepo;
 RedisTemplate<String, RedisUser> userRedisTemplate;
 HashOperations<String,String,RedisUser> userHashOperations;
-HashOperations<String,String, IdSimpSessionIdUser> idHashOperations;
+HashOperations<String,String, IdSessionIdUser> idHashOperations;
 public static final String USERS_KEY ="binance:users";
 public static final String USER_IDS_KEY ="binance:users:ids";
 @EventListener
@@ -53,9 +53,9 @@ public User findUserByName(String name){
 }
 
 public void saveInMemory(RedisUser user){
-    userHashOperations.put(USERS_KEY,user.getId(),user);
-    IdSimpSessionIdUser idSimpSessionIdUser=new IdSimpSessionIdUser(user.getSimpSessionId(), user.getId());
-    idHashOperations.put(USER_IDS_KEY, idSimpSessionIdUser.getSimpSessionId(),idSimpSessionIdUser);
+     userHashOperations.put(USERS_KEY,user.getId(),user);
+     IdSessionIdUser idSessionIdUser=new IdSessionIdUser(user.getSessionId(), user.getId());
+     idHashOperations.put(USER_IDS_KEY, user.getId(),idSessionIdUser);
 }
 
     public List<RedisUser> getAllFromInMemoryDb(){
@@ -65,8 +65,8 @@ public void saveInMemory(RedisUser user){
    return userHashOperations.get(USERS_KEY,id);
 }
 
-    public RedisUser getUserBySimpSessionId(String simpSessionId){
-    String id=idHashOperations.get(USER_IDS_KEY,simpSessionId).getId();
+    public RedisUser getUserBySessionId(String sessionId){
+    String id=idHashOperations.get(USER_IDS_KEY,sessionId).getId();
     return getUserByIdFromInMemory(id);
 }
 
