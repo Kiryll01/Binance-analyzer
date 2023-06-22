@@ -1,6 +1,5 @@
 package com.example.binanceanalizator.Models.Entities.InMemory;
 
-import com.example.binanceanalizator.Models.UserProperties;
 import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

@@ -1,30 +1,19 @@
 package com.example.binanceanalizator;
 
 import com.example.binanceanalizator.Controllers.Rest.AuthenticationController;
-import com.example.binanceanalizator.Controllers.Rest.StatsRestController;
 import com.example.binanceanalizator.Models.Entities.Embedded.User;
 import com.example.binanceanalizator.Models.Entities.Embedded.UserPropertiesEntity;
 import com.example.binanceanalizator.Models.Factories.UserFactory;
-import com.example.binanceanalizator.Services.MovingAverageService;
 import com.example.binanceanalizator.Services.UserService;
-import com.example.binanceanalizator.configs.WebSecurityConfig;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.annotation.Transient;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
@@ -71,7 +60,7 @@ public class MVCAuthenticationTests {
                 .email("hamilka540@gmail.com")
                 .name("hamilka540")
                 .pass("newPass")
-                .userSymbolSubscriptions(new HashSet<>())
+                .userSymbolSubscriptionEntities(new HashSet<>())
                 .userProperties(new UserPropertiesEntity())
                 .build();
 

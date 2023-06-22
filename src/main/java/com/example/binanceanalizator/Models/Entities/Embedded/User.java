@@ -1,6 +1,5 @@
 package com.example.binanceanalizator.Models.Entities.Embedded;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,6 +29,6 @@ String email;
 UserPropertiesEntity userProperties;
 @ManyToMany
 @Cascade({CascadeType.SAVE_UPDATE, CascadeType.MERGE, CascadeType.PERSIST})
-Set<UserSymbolSubscription> userSymbolSubscriptions;
+Set<UserSymbolSubscriptionEntity> userSymbolSubscriptionEntities;
 
 }

@@ -1,5 +1,6 @@
-package com.example.binanceanalizator.Models;
+package com.example.binanceanalizator.Models.Entities.InMemory;
 
+import com.example.binanceanalizator.Models.AbstractUserProperties;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

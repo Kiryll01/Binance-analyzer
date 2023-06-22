@@ -4,10 +4,9 @@ import com.example.binanceanalizator.Controllers.Rest.AuthenticationController;
 import com.example.binanceanalizator.Controllers.Rest.StatsRestController;
 import com.example.binanceanalizator.Controllers.Rest.UserController;
 import com.example.binanceanalizator.Models.Dto.UserDto;
-import com.example.binanceanalizator.Models.Entities.Embedded.UserSymbolSubscription;
+import com.example.binanceanalizator.Models.Entities.Embedded.UserSymbolSubscriptionEntity;
 import com.example.binanceanalizator.Models.SMA;
 import com.example.binanceanalizator.Models.SMARequestBody;
-import com.example.binanceanalizator.Models.UserProperties;
 import com.example.binanceanalizator.Services.MovingAverageService;
 import com.example.binanceanalizator.Services.UserService;
 import lombok.extern.log4j.Log4j2;
@@ -25,13 +24,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.text.SimpleDateFormat;
@@ -62,7 +59,7 @@ public class MVCTests {
                 .email("tarnokiryll@outlook.com")
                 .pass("passHuiNapass")
                 .userProperties(null)
-                .userSymbolSubscriptions(new HashSet<>(Set.of(new UserSymbolSubscription())))
+                .userSymbolSubscriptionEntities(new HashSet<>(Set.of(new UserSymbolSubscriptionEntity())))
                 .build();
 
         mockMvc = MockMvcBuilders

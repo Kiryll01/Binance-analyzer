@@ -5,7 +5,6 @@ import com.example.binanceanalizator.Models.Entities.InMemory.RedisUser;
 import com.example.binanceanalizator.Models.Factories.PropertiesFactory;
 import com.example.binanceanalizator.Models.Factories.UserFactory;
 import com.example.binanceanalizator.Models.UserPrincipal;
-import com.example.binanceanalizator.Models.UserProperties;
 import com.example.binanceanalizator.Models.ValidationUtils.UserPropertiesValidation;
 import com.example.binanceanalizator.Models.ValidationUtils.ValidationException;
 import com.example.binanceanalizator.Services.UserService;
@@ -16,10 +15,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
