@@ -12,6 +12,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public abstract class AbstractMovingAverageProperties implements Serializable {
-    long shortMillisInterval;
-    long longMillisInterval;
+  protected long shortMillisInterval;
+   protected long longMillisInterval;
 }

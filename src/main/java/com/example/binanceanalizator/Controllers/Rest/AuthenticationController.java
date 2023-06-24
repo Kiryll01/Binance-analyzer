@@ -3,8 +3,9 @@ package com.example.binanceanalizator.Controllers.Rest;
 import com.example.binanceanalizator.Controllers.ErrorHandlingUtils;
 import com.example.binanceanalizator.Models.Dto.UserDto;
 import com.example.binanceanalizator.Models.Entities.Embedded.User;
-import com.example.binanceanalizator.Models.Entities.Embedded.UserPropertiesEntity;
-import com.example.binanceanalizator.Models.Factories.UserFactory;
+import com.example.binanceanalizator.Models.Entities.InMemory.RedisUser;
+import com.example.binanceanalizator.Models.Entities.InMemory.UserProperties;
+import com.example.binanceanalizator.Models.Factories.UserServiceMapper;
 import com.example.binanceanalizator.Models.Roles;
 import com.example.binanceanalizator.Models.UserPrincipal;
 import com.example.binanceanalizator.Services.UserService;
@@ -18,23 +19,26 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
+import java.util.Set;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @RequiredArgsConstructor
 @Log4j2
 public class AuthenticationController {
+    UserServiceMapper userServiceMapper;
     AuthenticationEventPublisher authenticationEventPublisher;
     AuthenticationProvider authenticationProvider;
     UserService userService;
@@ -42,21 +46,21 @@ public class AuthenticationController {
     public static final String SIGN_IN_DESTINATION="/api/user/authentication/sign_in";
 
     @PostMapping(SIGN_UP_DESTINATION)
-    public ResponseEntity<?> signUp(@Validated @RequestBody UserDto user, BindingResult bindingResult,HttpSession httpSession)  {
+    public ResponseEntity<?> signUp(@Validated @RequestBody UserDto userDto, BindingResult bindingResult,HttpSession httpSession)  {
 
-        user.setUserProperties(UserPropertiesEntity.builder().role(Roles.RAW_USER.getValue()).build());
+        userDto.setUserProperties(UserProperties.builder().role(Roles.RAW_USER.getValue()).build());
 
         if(bindingResult.hasErrors()) return ErrorHandlingUtils.returnBindingResultEntity(bindingResult);
 
-if(userService.findUserByName(user.getName())!=null) return ResponseEntity.badRequest()
+if(userService.findUserByName(userDto.getName())!=null) return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("name already exists");
 
-        userService.save(UserFactory.makeUser(user));
+        userService.save(userServiceMapper.toUser(userDto));
 
         EntityModel<UserDto> userModel=
-                EntityModel.of(user,linkTo(methodOn(AuthenticationController.class)
-                        .signIn(user.getEmail(), user.getPass(),httpSession)).withRel(AuthenticationController.SIGN_IN_DESTINATION));
+                EntityModel.of(userDto,linkTo(methodOn(AuthenticationController.class)
+                        .signIn(userDto.getEmail(), userDto.getPass(),httpSession)).withRel(AuthenticationController.SIGN_IN_DESTINATION));
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -72,13 +76,17 @@ if(userService.findUserByName(user.getName())!=null) return ResponseEntity.badRe
 
     setAuthentication(user);
 
-    userService.saveInMemory(UserFactory.makeRedisUser(UserFactory.makeUserDto(user),httpSession.getId()));
+   RedisUser redisUser= userServiceMapper.toRedisUser(userServiceMapper.toUserDto(user));
+
+   redisUser.setSessionId(httpSession.getId());
+
+   userService.saveInMemory(redisUser);
 
     Authentication authentication=getAuthentication();
 
     UserPrincipal userPrincipal = (UserPrincipal)authentication.getPrincipal();
 
-    UserDto userDto=UserFactory.makeUserDto(userPrincipal.getUser());
+    UserDto userDto= userServiceMapper.toUserDto(userPrincipal.getUser());
 
     EntityModel<UserDto> userModel=
             EntityModel.of(userDto,linkTo(methodOn(AuthenticationController.class).signIn(email, pass,httpSession)).withSelfRel());
@@ -107,7 +115,8 @@ if(userService.findUserByName(user.getName())!=null) return ResponseEntity.badRe
     }
 
     private void setAuthentication(User user) {
-        Authentication authentication=authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(user.getName(), user.getPass()));
+        Authentication authentication=authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(user.getName(), user.getPass(),
+                Collections.singleton(new SimpleGrantedAuthority(user.getUserProperties().getRole()))));
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);

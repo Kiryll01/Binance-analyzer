@@ -3,7 +3,8 @@ package com.example.binanceanalizator;
 import com.example.binanceanalizator.Controllers.Rest.AuthenticationController;
 import com.example.binanceanalizator.Models.Entities.Embedded.User;
 import com.example.binanceanalizator.Models.Entities.Embedded.UserPropertiesEntity;
-import com.example.binanceanalizator.Models.Factories.UserFactory;
+import com.example.binanceanalizator.Models.Factories.UserServiceMapper;
+import com.example.binanceanalizator.Models.Roles;
 import com.example.binanceanalizator.Services.UserService;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -36,6 +37,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
 public class MVCAuthenticationTests {
+    @Autowired
+    UserServiceMapper userServiceMapper;
     public static final String NAME = "hamilka540";
     public static final String EMAIL = "hamilka540@gmail.com";
     public static final String PASS = "newPass";
@@ -47,6 +50,7 @@ public class MVCAuthenticationTests {
     @Autowired
      WebApplicationContext context;
     public static final String PATH="http://localhost:8080";
+    User userToSave;
     @BeforeAll
     public void setup()  {
         mockMvc = MockMvcBuilders
@@ -56,27 +60,29 @@ public class MVCAuthenticationTests {
 
         //UserPropertiesEntity.builder()
 
-        User userToSave=User.builder()
+        userToSave=User.builder()
                 .email("hamilka540@gmail.com")
                 .name("hamilka540")
                 .pass("newPass")
-                .userSymbolSubscriptionEntities(new HashSet<>())
-                .userProperties(new UserPropertiesEntity())
+                .userSymbolSubscriptions(new HashSet<>())
+                .userProperties(UserPropertiesEntity.builder().role(Roles.RAW_USER.getValue()).build())
                 .build();
 
-        userService.save(userToSave);
+
 
     }
     @AfterAll
     @Transactional
     public void afterAll(){
-       if(userService.deleteUserByEmailAndPass(EMAIL,PASS)!=null) userService.deleteUserByEmailAndPass("hamilka540@gmail.com","newPass");
+     //  if(userService.deleteUserByEmailAndPass(EMAIL,PASS)!=null) userService.deleteUserByEmailAndPass("hamilka540@gmail.com","newPass");
     }
     @Test
     @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
     public void testSignIn() throws Exception {
 
        // Mockito.when(userService.findUserByEmailAndPass(email,pass)).thenReturn(userToSave);
+
+        userService.save(userToSave);
 
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post(PATH+AuthenticationController.SIGN_IN_DESTINATION)
                         .with(csrf())
@@ -91,6 +97,7 @@ public class MVCAuthenticationTests {
 
         log.info(response.getContentAsString());
 
+        userService.delete(userToSave);
     }
     @Test
     @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
@@ -108,12 +115,14 @@ public class MVCAuthenticationTests {
    //     Mockito.when(userService.save(userToSave)).thenReturn(userToSave);
 
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post(PATH+ AuthenticationController.SIGN_UP_DESTINATION).with(csrf())
-                        .content(mapper.writeValueAsString(UserFactory.makeUserDto(userToSave)))
+                        .content(mapper.writeValueAsString(userServiceMapper.toUserDto(userToSave)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn()
                 .getResponse();
 
         log.info(response.getContentAsString());
+
+        userService.delete(userToSave);
     }
 }

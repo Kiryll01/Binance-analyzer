@@ -20,12 +20,33 @@ public class MovingAveragePropertiesEntity extends AbstractMovingAverageProperti
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     @OneToOne(mappedBy ="movingAverageProperties")
-            @JsonBackReference
+    @JsonBackReference
+    @ToString.Exclude
     UserPropertiesEntity userProperties;
 
     public MovingAveragePropertiesEntity(long shortMillisInterval, long longMillisInterval, String id, UserPropertiesEntity userProperties) {
         super(shortMillisInterval, longMillisInterval);
         this.id = id;
         this.userProperties = userProperties;
+    }
+
+    @Override
+    public long getLongMillisInterval() {
+        return super.getLongMillisInterval();
+    }
+
+    @Override
+    public long getShortMillisInterval() {
+        return super.getShortMillisInterval();
+    }
+
+    @Override
+    public void setShortMillisInterval(long shortMillisInterval) {
+        super.setShortMillisInterval(shortMillisInterval);
+    }
+
+    @Override
+    public void setLongMillisInterval(long longMillisInterval) {
+        super.setLongMillisInterval(longMillisInterval);
     }
 }

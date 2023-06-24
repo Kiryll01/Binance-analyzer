@@ -5,6 +5,7 @@ import com.example.binanceanalizator.Controllers.Rest.StatsRestController;
 import com.example.binanceanalizator.Controllers.Rest.UserController;
 import com.example.binanceanalizator.Models.Dto.UserDto;
 import com.example.binanceanalizator.Models.Entities.Embedded.UserSymbolSubscriptionEntity;
+import com.example.binanceanalizator.Models.Entities.InMemory.UserSymbolSubscription;
 import com.example.binanceanalizator.Models.SMA;
 import com.example.binanceanalizator.Models.SMARequestBody;
 import com.example.binanceanalizator.Services.MovingAverageService;
@@ -59,7 +60,7 @@ public class MVCTests {
                 .email("tarnokiryll@outlook.com")
                 .pass("passHuiNapass")
                 .userProperties(null)
-                .userSymbolSubscriptionEntities(new HashSet<>(Set.of(new UserSymbolSubscriptionEntity())))
+                .userSymbolSubscriptions(new HashSet<>(Set.of(new UserSymbolSubscription("BTCUSDT"))))
                 .build();
 
         mockMvc = MockMvcBuilders

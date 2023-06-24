@@ -2,8 +2,7 @@ package com.example.binanceanalizator.Controllers.Rest;
 
 import com.example.binanceanalizator.Models.Dto.UserDto;
 import com.example.binanceanalizator.Models.Entities.InMemory.RedisUser;
-import com.example.binanceanalizator.Models.Factories.PropertiesFactory;
-import com.example.binanceanalizator.Models.Factories.UserFactory;
+import com.example.binanceanalizator.Models.Factories.UserServiceMapper;
 import com.example.binanceanalizator.Models.UserPrincipal;
 import com.example.binanceanalizator.Models.ValidationUtils.UserPropertiesValidation;
 import com.example.binanceanalizator.Models.ValidationUtils.ValidationException;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Log4j2
 public class UserController {
+    UserServiceMapper userServiceMapper;
     UserService userService;
     public static final String GET_ACCOUNT_INFORMATION="/api/user/account/information";
     public static final String SET_ACCOUNT_INFORMATION="/api/user/account/edit";
@@ -31,7 +31,7 @@ public class UserController {
     public ResponseEntity<UserDto> getAccountInformation(Authentication authentication)throws UsernameNotFoundException {
        UserPrincipal userPrincipal=(UserPrincipal) userService.loadUserByUsername (authentication.getName());
     return ResponseEntity.ok()
-            .body(UserFactory.makeUserDto(userPrincipal.getUser()));
+            .body(userServiceMapper.toUserDto(userPrincipal.getUser()));
     }
     //TODO: save user properties after disconnect
     @PutMapping(SET_ACCOUNT_INFORMATION)
@@ -39,11 +39,11 @@ public class UserController {
 
        RedisUser redisUser=userService.getUserBySessionId(httpSession.getId());
 
-        UserPropertiesValidation.checkMovingAverageProperties(redisUser.getMovingAverageProperties());
+        UserPropertiesValidation.checkMovingAverageProperties(redisUser.getUserProperties().getMovingAverageProperties());
 
-       redisUser.setMovingAverageProperties(PropertiesFactory.makeMovingAverageProperties(userDto.getUserProperties().getMovingAverageProperties()));
+       redisUser.getUserProperties().setMovingAverageProperties(userDto.getUserProperties().getMovingAverageProperties());
 
-       redisUser.setUserProperties(PropertiesFactory.makeUserProperties(userDto.getUserProperties()));
+       redisUser.setUserProperties(userDto.getUserProperties());
 
       return ResponseEntity.ok()
               .contentType(MediaType.APPLICATION_JSON)

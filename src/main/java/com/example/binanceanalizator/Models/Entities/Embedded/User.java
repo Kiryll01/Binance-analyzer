@@ -29,6 +29,53 @@ String email;
 UserPropertiesEntity userProperties;
 @ManyToMany
 @Cascade({CascadeType.SAVE_UPDATE, CascadeType.MERGE, CascadeType.PERSIST})
-Set<UserSymbolSubscriptionEntity> userSymbolSubscriptionEntities;
+Set<UserSymbolSubscriptionEntity> userSymbolSubscriptions;
 
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPass() {
+        return pass;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public UserPropertiesEntity getUserProperties() {
+        return userProperties;
+    }
+
+    public Set<UserSymbolSubscriptionEntity> getUserSymbolSubscriptions() {
+        return userSymbolSubscriptions;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setUserProperties(UserPropertiesEntity userProperties) {
+        this.userProperties = userProperties;
+    }
+
+    public void setUserSymbolSubscriptions(Set<UserSymbolSubscriptionEntity> userSymbolSubscriptions) {
+        this.userSymbolSubscriptions = userSymbolSubscriptions;
+    }
 }

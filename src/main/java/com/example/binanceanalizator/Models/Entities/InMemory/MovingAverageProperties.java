@@ -20,4 +20,24 @@ public class MovingAverageProperties extends AbstractMovingAverageProperties imp
     public MovingAverageProperties(long shortMillisInterval, long longMillisInterval) {
         super(shortMillisInterval, longMillisInterval);
     }
+
+    @Override
+    public long getShortMillisInterval() {
+        return super.getShortMillisInterval();
+    }
+
+    @Override
+    public long getLongMillisInterval() {
+        return super.getLongMillisInterval();
+    }
+
+    @Override
+    public void setShortMillisInterval(long shortMillisInterval) {
+        super.setShortMillisInterval(shortMillisInterval);
+    }
+
+    @Override
+    public void setLongMillisInterval(long longMillisInterval) {
+        super.setLongMillisInterval(longMillisInterval);
+    }
 }

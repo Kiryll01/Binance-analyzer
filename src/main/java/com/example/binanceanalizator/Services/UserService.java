@@ -35,7 +35,9 @@ public static final String USER_IDS_KEY ="binance:users:ids";
 public void afterAuthenticationSuccess(AuthenticationSuccessEvent event){
     log.info(event.getAuthentication().getName());
 }
-
+public void delete(User user){
+    usersRepo.delete(user);
+}
 public Integer deleteUserByEmailAndPass(String email,String pass){
    return usersRepo.deleteUserByEmailAndPass(email,pass);
 }

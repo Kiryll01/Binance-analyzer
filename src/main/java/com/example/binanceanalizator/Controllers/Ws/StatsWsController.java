@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -65,25 +64,25 @@ messagingTemplate.convertAndSend(FETCH_TICKER_STATS,statsSet);
 userService.getAllFromInMemoryDb().stream()
         .filter(user -> checkRole(user.getUserProperties().getRole()))
         .forEach(user ->
-        user.getSymbols().forEach(s->
-                calculateAndSendSMAToUser(user, s)));
+        user.getUserSymbolSubscriptions().forEach(uss->
+                calculateAndSendSMAToUser(user, uss.getSymbolName())));
     }
 
     private void calculateAndSendSMAToUser(RedisUser user, String symbol) {
 
-      long shortMillisInterval = user.getMovingAverageProperties().getShortMillisInterval();
+      long shortMillisInterval = user.getUserProperties().getMovingAverageProperties().getShortMillisInterval();
 
-      long longMillisInterval=user.getMovingAverageProperties().getLongMillisInterval();
+      long longMillisInterval=user.getUserProperties().getMovingAverageProperties().getLongMillisInterval();
 
       long endTime=Instant.now().getEpochSecond();
 
         List<SMA> shortSma= movingAverageService.calculateSMAForAPeriod(symbol,
-        user.getMovingAverageProperties().getShortMillisInterval(),
+        user.getUserProperties().getMovingAverageProperties().getShortMillisInterval(),
                 endTime-shortMillisInterval*50,
                 endTime);
 
         List<SMA> longSma=movingAverageService.calculateSMAForAPeriod(symbol,
-                user.getMovingAverageProperties().getLongMillisInterval(),
+                user.getUserProperties().getMovingAverageProperties().getLongMillisInterval(),
                 endTime-longMillisInterval*50,
                 endTime);
 

@@ -22,10 +22,11 @@ public class UserPropertiesEntity extends AbstractUserProperties {
     String id;
     @OneToOne(mappedBy = "userProperties")
     @JsonBackReference
+    @ToString.Exclude
     User user;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "map_id")
-            @JsonManagedReference
+    @JsonManagedReference
     MovingAveragePropertiesEntity movingAverageProperties;
 
     public UserPropertiesEntity(String role, String id, User user, MovingAveragePropertiesEntity movingAverageProperties) {
@@ -33,5 +34,39 @@ public class UserPropertiesEntity extends AbstractUserProperties {
         this.id = id;
         this.user = user;
         this.movingAverageProperties = movingAverageProperties;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public MovingAveragePropertiesEntity getMovingAverageProperties() {
+        return movingAverageProperties;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setMovingAverageProperties(MovingAveragePropertiesEntity movingAverageProperties) {
+        this.movingAverageProperties = movingAverageProperties;
+    }
+
+    @Override
+    public String getRole() {
+        return super.getRole();
+    }
+
+    @Override
+    public void setRole(String role) {
+        super.setRole(role);
     }
 }

@@ -21,10 +21,57 @@ public class RedisUser implements Serializable {
     @Builder.Default
     String id= UUID.randomUUID().toString();
     String name;
-    Set<String> symbols;
+    Set<UserSymbolSubscription> userSymbolSubscriptions;
     UserProperties userProperties;
     String sessionId;
-    MovingAverageProperties movingAverageProperties;
     @Builder.Default
     long createdAt= Instant.now().getEpochSecond();
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Set<UserSymbolSubscription> getUserSymbolSubscriptions() {
+        return userSymbolSubscriptions;
+    }
+
+    public UserProperties getUserProperties() {
+        return userProperties;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setUserSymbolSubscriptions(Set<UserSymbolSubscription> userSymbolSubscriptions) {
+        this.userSymbolSubscriptions = userSymbolSubscriptions;
+    }
+
+    public void setUserProperties(UserProperties userProperties) {
+        this.userProperties = userProperties;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
 }
