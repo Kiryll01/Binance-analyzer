@@ -72,7 +72,7 @@ public class MVCTests {
     @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
 public void testPutSettingsRequest() throws Exception {
 
-       MockHttpServletResponse response= mockMvc.perform(MockMvcRequestBuilders.put(PATH+UserController.SET_ACCOUNT_INFORMATION).contentType(MediaType.APPLICATION_JSON)
+       MockHttpServletResponse response= mockMvc.perform(MockMvcRequestBuilders.put(PATH+UserController.SET_PROPERTIES_INFORMATION).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(userDto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn()

@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,6 @@ public class ApplicationLifecycle {
     PasswordEncoder encoder;
 
     //TODO: be careful, because all data is cleaned up at the start of application
-
 @PostConstruct
 public void setStaticEncoder(){
 

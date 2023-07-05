@@ -1,6 +1,7 @@
 package com.example.binanceAnalyzer.Controllers;
 
 import com.example.binanceAnalyzer.Models.ValidationUtils.ValidationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,5 +19,9 @@ public class ExceptionHandlerController {
     ResponseEntity<String> handleValidationException(ValidationException e){
     return ResponseEntity.badRequest()
             .body(e.getMessage()+" "+ e);
+}
+@ExceptionHandler(value = JsonProcessingException.class)
+    ResponseEntity<String> handleJsonProcessingException(JsonProcessingException e){
+    return ResponseEntity.internalServerError().build();
 }
 }

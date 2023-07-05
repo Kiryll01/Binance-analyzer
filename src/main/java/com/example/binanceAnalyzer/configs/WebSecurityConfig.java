@@ -1,6 +1,7 @@
 package com.example.binanceAnalyzer.configs;
 
 import com.example.binanceAnalyzer.Controllers.Rest.AuthenticationController;
+import com.example.binanceAnalyzer.Controllers.Rest.UserController;
 import com.example.binanceAnalyzer.Models.Entities.InMemory.IdSessionIdUser;
 import com.example.binanceAnalyzer.Models.Entities.InMemory.RedisUser;
 import com.example.binanceAnalyzer.Services.UserService;
@@ -60,6 +61,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(AuthenticationController.SIGN_UP_DESTINATION).permitAll()
                 .requestMatchers(AuthenticationController.SIGN_IN_DESTINATION).anonymous()
+                .requestMatchers(UserController.GET_ACCOUNT_INFORMATION).fullyAuthenticated()
                 .anyRequest().authenticated()
                 .and()
                 .logout().permitAll()

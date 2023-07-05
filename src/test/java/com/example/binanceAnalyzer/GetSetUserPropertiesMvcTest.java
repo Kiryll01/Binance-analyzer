@@ -5,6 +5,7 @@ import com.example.binanceAnalyzer.Models.Entities.Embedded.User;
 import com.example.binanceAnalyzer.Models.Entities.InMemory.MovingAverageProperties;
 import com.example.binanceAnalyzer.Models.Entities.InMemory.RedisUser;
 import com.example.binanceAnalyzer.Models.Entities.InMemory.UserProperties;
+import com.example.binanceAnalyzer.Models.Entities.InMemory.UserSymbolSubscription;
 import com.example.binanceAnalyzer.Models.Factories.UserServiceMapper;
 import com.example.binanceAnalyzer.Models.Requests.PropertiesRequestBody;
 import com.example.binanceAnalyzer.Services.UserService;
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -62,14 +64,8 @@ public class GetSetUserPropertiesMvcTest {
         HttpHeaders ssHeaders =new HttpHeaders();
         public static final String PATH="http://localhost:8080";
         User userToSave;
-        WebTestClient testClient;
         @BeforeAll
         public void setup() throws Exception {
-
-            testClient=WebTestClient
-                    .bindToServer()
-                    .baseUrl(PATH)
-                    .build();
 
             mockMvc = MockMvcBuilders
                     .webAppContextSetup(context)
@@ -92,6 +88,7 @@ public class GetSetUserPropertiesMvcTest {
         public void testSetUserInf() throws Exception {
 
          PropertiesRequestBody requestBody = PropertiesRequestBody.builder()
+                 .symbolSubscriptions(Set.of(new UserSymbolSubscription("BTCUSDT"),new UserSymbolSubscription("LTCUSDT")))
                     .userProperties(UserProperties
                             .builder()
                             .role("ROLE_RAW")
@@ -104,13 +101,8 @@ public class GetSetUserPropertiesMvcTest {
                             .build())
                     .build();
 
-           MockHttpSession httpSession=new MockHttpSession();
-            //UserPropertiesEntity.builder()
-           Mockito.when(userService.getUserBySessionIdFromInMemory(httpSession.getId())).thenReturn(new RedisUser());
-
-            MockHttpServletResponse response= mockMvc.perform(MockMvcRequestBuilders.patch(PATH+UserController.SET_ACCOUNT_INFORMATION)
+            MockHttpServletResponse response= mockMvc.perform(MockMvcRequestBuilders.patch(PATH+UserController.SET_PROPERTIES_INFORMATION)
                             .with(csrf())
-                            .session(httpSession)
                             .content(mapper.writeValueAsString(requestBody))
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(MockMvcResultMatchers.status().isOk())

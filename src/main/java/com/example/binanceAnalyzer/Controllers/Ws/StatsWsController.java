@@ -44,7 +44,7 @@ public final static long FIXED_RATE_FOR_SMA=1000;
 }
 
 @SubscribeMapping(FETCH_MA_STATS)
-public Set<SMA> translateSMA(){
+public Set<SMA> translateMA(){
         return null;
 }
 
@@ -58,6 +58,7 @@ messagingTemplate.convertAndSend(FETCH_TICKER_STATS,statsSet);
 //log.info("SCHEDULING : message converted and send with payload : "+statsSet);
 }
 
+//TODO : send Advices to buy or sell for each user
 @Scheduled(fixedRate = FIXED_RATE_FOR_SMA)
     public void sendMovingAverages(){
 userService.getAllFromInMemoryDb().stream()
@@ -79,6 +80,9 @@ userService.getAllFromInMemoryDb().stream()
       sendSma(user, symbol, shortMillisInterval, longMillisInterval, endTime);
 
       sendEma(user, symbol, shortMillisInterval, longMillisInterval, endTime);
+
+      log.info("Moving averages data send to user : " + user);
+
     }
 
     private void sendSma(RedisUser user, String symbol, long shortMillisInterval, long longMillisInterval, long endTime) {
