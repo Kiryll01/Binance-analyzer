@@ -8,6 +8,7 @@ import com.example.binanceAnalyzer.Models.Entities.InMemory.UserProperties;
 import com.example.binanceAnalyzer.Models.Entities.InMemory.UserSymbolSubscription;
 import com.example.binanceAnalyzer.Models.Factories.UserServiceMapper;
 import com.example.binanceAnalyzer.Models.Requests.PropertiesRequestBody;
+import com.example.binanceAnalyzer.Properties.BinanceProperties;
 import com.example.binanceAnalyzer.Services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
@@ -21,6 +22,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -43,7 +45,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 @Log4j2
-@WebMvcTest(controllers = UserController.class)
+//@WebMvcTest(controllers = UserController.class)
+@SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -101,13 +104,29 @@ public class GetSetUserPropertiesMvcTest {
                             .build())
                     .build();
 
-            MockHttpServletResponse response= mockMvc.perform(MockMvcRequestBuilders.patch(PATH+UserController.SET_PROPERTIES_INFORMATION)
+            MockHttpServletResponse badRequestResponse= mockMvc.perform(MockMvcRequestBuilders.patch(PATH+UserController.SET_PROPERTIES_INFORMATION)
                             .with(csrf())
                             .content(mapper.writeValueAsString(requestBody))
                     .contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(MockMvcResultMatchers.status().isBadRequest())
                     .andReturn()
                     .getResponse();
+
+            log.info(badRequestResponse.getContentAsString());
+            badRequestResponse.getHeaderNames().forEach(name-> System.out.println(badRequestResponse.getHeaderValues(name)));
+
+            requestBody.setSymbolSubscriptions(Set.of(new UserSymbolSubscription("BTCUSDT")));
+
+            MockHttpServletResponse okResponse= mockMvc.perform(MockMvcRequestBuilders.patch(PATH+UserController.SET_PROPERTIES_INFORMATION)
+                            .with(csrf())
+                            .content(mapper.writeValueAsString(requestBody))
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                    .andReturn()
+                    .getResponse();
+
+       log.info(okResponse.getContentAsString());
+       okResponse.getHeaderNames().forEach(name-> System.out.println(okResponse.getHeaderValues(name)));
         }
 //        @Test
 //

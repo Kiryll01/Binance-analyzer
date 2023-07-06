@@ -45,7 +45,9 @@ public void setStaticEncoder(){
     @PostConstruct
     public void CleanAndFillRedisData(){
 
-        redisTemplate.getConnectionFactory().getConnection().flushAll();
+       Set<Object> keys= redisTemplate.opsForHash().keys(TickerStatisticsService.KEY);
+
+       redisTemplate.opsForHash().delete(TickerStatisticsService.KEY,keys);
 
     log.warn("redis is cleaned");
 

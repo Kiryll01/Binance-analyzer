@@ -40,18 +40,6 @@ public class DBTests {
     UserService userService;
 
     RedisUser redisUserToSave;
-//    @BeforeAll
-//    public void setup(){
-//        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration("localhost", 6379);
-//        redisTemplate=new RedisTemplate<>();
-//       JedisConnectionFactory jedisConnectionFactory= new JedisConnectionFactory(redisConfiguration);
-//       jedisConnectionFactory.afterPropertiesSet();
-//        redisTemplate.setConnectionFactory(jedisConnectionFactory);
-//        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-//        redisTemplate.setKeySerializer(new StringRedisSerializer());
-//        redisTemplate.afterPropertiesSet();
-//    }
-
 
     @BeforeAll
     public void setup(){
@@ -112,8 +100,7 @@ public class DBTests {
 
 tickerStatisticsService.saveInMemoryDb(tickerStatisticsDao);
 
-        TickerStatisticsRedis tickerStatisticsDaoFromDB=
-                (TickerStatisticsRedis) redisOperations.getLastFromInMemoryDBByKey(TickerStatisticsService.KEY);
+        TickerStatisticsRedis tickerStatisticsDaoFromDB=tickerStatisticsService.getRedisTickerStatsByID(tickerStatisticsDao.getId());
 
         log.info(tickerStatisticsDaoFromDB);
 

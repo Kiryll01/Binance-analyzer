@@ -1,14 +1,11 @@
 package com.example.binanceAnalyzer;
 
-import com.example.binanceAnalyzer.Controllers.Rest.AuthenticationController;
 import com.example.binanceAnalyzer.Controllers.Rest.StatsRestController;
-import com.example.binanceAnalyzer.Controllers.Rest.UserController;
 import com.example.binanceAnalyzer.Models.Dto.UserDto;
 import com.example.binanceAnalyzer.Models.Entities.InMemory.UserSymbolSubscription;
 import com.example.binanceAnalyzer.Models.Plain.SMA;
 import com.example.binanceAnalyzer.Models.Requests.SMARequestBody;
 import com.example.binanceAnalyzer.Services.MovingAverageService;
-import com.example.binanceAnalyzer.Services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -19,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -34,19 +30,15 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Log4j2
-@WebMvcTest({StatsRestController.class, AuthenticationController.class})
+@WebMvcTest({StatsRestController.class})
 @AutoConfigureMockMvc
-@ComponentScan({"com.example.binanceAnalyzer.Controllers.Rest"})
-//@Import(WebSecurityConfig.class)
-public class MVCTests {
+public class StatsRestControllerTest {
     UserDto userDto;
     @Autowired
     MockMvc mockMvc;
     ObjectMapper mapper=new ObjectMapper();
     @MockBean
     MovingAverageService movingAverageService;
-    @MockBean
-    UserService userService;
     @Autowired
     private WebApplicationContext context;
   public static final String PATH="http://localhost:8080";
@@ -69,19 +61,7 @@ public class MVCTests {
 
     }
     @Test
-    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
-public void testPutSettingsRequest() throws Exception {
-
-       MockHttpServletResponse response= mockMvc.perform(MockMvcRequestBuilders.put(PATH+UserController.SET_PROPERTIES_INFORMATION).contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(userDto)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn()
-                .getResponse();
-
-       log.info(response.getContentAsString());
-    }
-    @Test
-    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+    @WithMockUser(username = "kiryll", roles = {"RAW" , "ADMIN"})
     public void testSmaRequest() throws Exception {
 
        String startTime="2023-04-13 00:00:00";

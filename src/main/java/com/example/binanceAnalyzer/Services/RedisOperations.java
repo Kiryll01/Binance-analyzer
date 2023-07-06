@@ -16,7 +16,7 @@ import java.util.List;
 public class RedisOperations {
     RedisTemplate<String, Object> redisTemplate;
     public Object getLastFromInMemoryDBByKey(String key){
-        int size= Math.toIntExact(redisTemplate.opsForHash().size(key));
+       int size=redisTemplate.opsForHash().size(key).intValue();
         return  redisTemplate
                 .opsForHash()
                 .values(key)

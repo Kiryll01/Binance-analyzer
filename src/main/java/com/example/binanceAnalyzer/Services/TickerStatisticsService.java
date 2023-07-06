@@ -12,10 +12,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.security.Key;
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,7 +31,7 @@ public Set<TickerStatisticsDto> getLastTickerStatisticsInTimeIntervalFromMemoryD
     long now=Instant.now().getEpochSecond();
     return redisTemplate.opsForHash().values(KEY)
             .stream()
-            .map(ticker->TickerStatisticsRedis.class.cast(ticker))
+            .map(TickerStatisticsRedis.class::cast)
             .filter(ticker->(now-ticker.getCreatedAt())<interval)
             .map(tickerStatisticsRedis -> tickerStatisticsFactory.fromRedisToDtoObject(tickerStatisticsRedis))
             .collect(Collectors.toSet());
@@ -67,6 +64,9 @@ return TickerStatisticsRedis.builder()
 public void saveInMemoryDb(TickerStatisticsRedis tickerStatisticsRedis){
 
     redisTemplate.opsForHash().put(KEY,tickerStatisticsRedis.getId(),tickerStatisticsRedis);
+}
+public TickerStatisticsRedis getRedisTickerStatsByID(String id){
+    return (TickerStatisticsRedis) redisTemplate.opsForHash().get(KEY,id);
 }
 public void deleteAll(){
    Set<Object> keys= redisTemplate.opsForHash().keys(KEY);

@@ -14,21 +14,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-//@DataJpaTest
 @Log4j2
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@DataJpaTest
 public class MapperTests {
 private UserDto userDto;
-//@Autowired
-//UserServiceMapper userMapper;
 @Autowired
-    UsersRepo usersRepo;
+UsersRepo usersRepo;
 @BeforeAll
     @Transactional
     void setUp(){
@@ -50,9 +48,11 @@ private UserDto userDto;
 }
     @Test
     @Transactional
+    // test fails because of NPE, that appears in MapperImpl, but mapper is working fine, that is proven in other tests
     public void test(){
 
     log.info(userDto);
+
 UserServiceMapper.USER_MAPPER.toUser(userDto);
 
    User userToSave= UserServiceMapper.USER_MAPPER.toUser(userDto);

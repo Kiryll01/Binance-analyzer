@@ -22,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
@@ -39,11 +40,20 @@ HashOperations<String,String, IdSessionIdUser> idHashOperations;
 public static final String USERS_KEY ="binance:users";
 public static final String USER_IDS_KEY ="binance:users:ids";
 @EventListener
+public void handleSubscriptionFrame(SessionConnectEvent event){
+
+   UserPrincipal user= (UserPrincipal) event.getUser();
+
+    log.info(user.getUsername()+" " +user.getAuthorities()+" send a CONNECT FRAME");
+}
+@EventListener
 public void afterAuthenticationSuccess(AuthenticationSuccessEvent event){
     log.info(event.getAuthentication().getName()+" is now Authenticated");
 }
 @EventListener
 public void afterSessionEstablished(SessionConnectedEvent event){
+
+    log.info(event.getUser().getName()+ " is now connected using STOMP");
 
     String sessionId= SimpAttributesContextHolder.getAttributes().getSessionId();
 

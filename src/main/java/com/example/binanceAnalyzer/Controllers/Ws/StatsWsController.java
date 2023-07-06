@@ -118,12 +118,10 @@ userService.getAllFromInMemoryDb().stream()
         messagingTemplate.convertAndSendToUser(user.getSessionId(), FETCH_MA_STATS,longEma);
     }
     public boolean checkRole(String role){
-        if(role.equals(Roles.RAW_USER.getValue()))return false;
-        return true;
+        return !role.equals(Roles.RAW_USER.getValue());
     }
     public boolean checkSessionId(String sessionId){
-        if(sessionId!=null && sessionId.length()>0) return true;
-        return false;
+        return sessionId != null && sessionId.length() > 0;
     }
 
     @NotNull
