@@ -20,14 +20,12 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +45,7 @@ public class AuthenticationController {
     public static final String SIGN_IN_DESTINATION="/api/user/authentication/sign_in";
 
     @PostMapping(SIGN_UP_DESTINATION)
-    public ResponseEntity<?> signUp(HttpServletRequest request,@Validated @RequestBody UserDto userDto, BindingResult bindingResult,HttpSession httpSession)  {
+    public ResponseEntity<?> signUp(@Validated @RequestBody UserDto userDto, BindingResult bindingResult,HttpServletRequest request)  {
 
         userDto.setUserProperties(UserProperties.builder().role(Roles.RAW_USER.getValue()).build());
 
@@ -88,7 +86,6 @@ if(userService.findUserByName(userDto.getName())!=null) return ResponseEntity.ba
     UserDto userDto= userServiceMapper.toUserDto(userPrincipal.getUser());
 
     EntityModel<UserDto> userModel= EntityModel.of(userDto);
-           // EntityModel.of(userDto,linkTo(methodOn(AuthenticationController.class).signIn(request,email, pass,httpSession)).withSelfRel());
 
     HttpHeaders headers = setHeaders(userPrincipal.getUsername(),token);
 
@@ -131,23 +128,5 @@ if(userService.findUserByName(userDto.getName())!=null) return ResponseEntity.ba
     }
 
 
-//@ExceptionHandler(ValidationException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ResponseEntity<Map<String,String>> handleValidationExceptions(ValidationException validationException){
-//
-//        Map<String,String> errors=new HashMap<>();
-//
-//        validationException.getErrors().forEach(objectError ->errors.put(objectError.getObjectName(),objectError.getCode()));
-//
-//   HttpHeaders headers= new HttpHeaders();
-//
-//   headers.add("class_name",validationException.getClazz().getName());
-//
-//        return ResponseEntity
-//                .badRequest()
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .headers(headers)
-//                .body(errors);
-//}
 }
 

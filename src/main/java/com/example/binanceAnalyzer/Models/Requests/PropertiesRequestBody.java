@@ -2,15 +2,13 @@ package com.example.binanceAnalyzer.Models.Requests;
 
 import com.example.binanceAnalyzer.Models.Entities.InMemory.UserProperties;
 import com.example.binanceAnalyzer.Models.Entities.InMemory.UserSymbolSubscription;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Set;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @Builder

@@ -27,15 +27,15 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BinanceWsClientConfig {
-    @Value("${app.binance.key.key}")
-    String key;
-   @Value("${app.binance.key.secret}")
-    String secret;
+//    @Value("${app.binance.key.key}")
+//    String key;
+//   @Value("${app.binance.key.secret}")
+//    String secret;
     final TickerStatisticsFactory tickerStatisticsFactory;
    final BinanceProperties properties;
 final RedisOperations redisOperations;
    final BinanceStatisticsService binanceStatisticsService;
-
+    public static volatile int tickerStatisticsRedisCount=0;
    final TickerStatisticsService tickerStatisticsService;
    @Bean
     public BinanceApiWebSocketClient binanceApiWebSocketClient(){
@@ -52,8 +52,17 @@ return client;
     private void fetchCandleStickEventData(CandlestickEvent event){
       // log.info("raw stats : " + event);
 
+
+        if(tickerStatisticsRedisCount>49) {
+            TickerStatisticsRedis tickerStatisticsRedis= (TickerStatisticsRedis) redisOperations.getLastFromInMemoryDBByKey(TickerStatisticsService.KEY);
+            tickerStatisticsService.deleteAll();
+            tickerStatisticsService.saveInMemoryDb(tickerStatisticsRedis);
+        }
+
         TickerStatisticsRedis tickerStatisticsRedis =tickerStatisticsService.calculateStatistics(event);
        // log.info("calculated stats : "+ tickerStatisticsRedis);
+
+        tickerStatisticsRedisCount++;
 
       tickerStatisticsService.saveInMemoryDb(tickerStatisticsRedis);
 
@@ -61,14 +70,6 @@ return client;
     }
 
 
-
-
-    public void fetchAggTradeData(AggTradeEvent event) {
-
-    }
-    public void fetchBookTicketData(BookTickerEvent event){
-
-   }
 public void fetchDepthEventData(DepthEvent event){
     System.out.println(Strings.repeat("-",100));
     System.out.println("bid price:"+event.getBids());

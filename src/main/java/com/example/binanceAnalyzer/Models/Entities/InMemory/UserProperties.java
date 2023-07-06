@@ -9,13 +9,14 @@ import java.io.Serializable;
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-//@Getter
-//@Setter
+@NoArgsConstructor
 public class UserProperties extends AbstractUserProperties implements Serializable {
-    public UserProperties(String role) {
+    public UserProperties(String role, MovingAverageProperties movingAverageProperties) {
         super(role);
+        this.movingAverageProperties = movingAverageProperties;
     }
-   private MovingAverageProperties movingAverageProperties;
+
+    private MovingAverageProperties movingAverageProperties;
 
     public MovingAverageProperties getMovingAverageProperties() {
         return movingAverageProperties;

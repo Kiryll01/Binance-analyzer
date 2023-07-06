@@ -61,7 +61,6 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(AuthenticationController.SIGN_UP_DESTINATION).permitAll()
                 .requestMatchers(AuthenticationController.SIGN_IN_DESTINATION).anonymous()
-                .requestMatchers(UserController.GET_ACCOUNT_INFORMATION).fullyAuthenticated()
                 .anyRequest().authenticated()
                 .and()
                 .logout().permitAll()

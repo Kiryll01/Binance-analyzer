@@ -18,7 +18,7 @@ import java.io.Serializable;
 @MappedSuperclass
 public abstract class AbstractUserProperties implements Serializable {
     @Nullable
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    //@JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(name = "role")
     String role;
 

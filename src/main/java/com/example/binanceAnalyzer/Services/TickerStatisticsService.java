@@ -13,7 +13,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.security.Key;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -66,7 +68,10 @@ public void saveInMemoryDb(TickerStatisticsRedis tickerStatisticsRedis){
 
     redisTemplate.opsForHash().put(KEY,tickerStatisticsRedis.getId(),tickerStatisticsRedis);
 }
-
+public void deleteAll(){
+   Set<Object> keys= redisTemplate.opsForHash().keys(KEY);
+    redisTemplate.opsForHash().delete(KEY,keys);
+}
 
 public TickerStatistics saveInLocalDb(TickerStatistics tickerStatistics){
 

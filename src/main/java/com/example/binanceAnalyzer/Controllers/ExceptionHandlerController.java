@@ -20,8 +20,8 @@ public class ExceptionHandlerController {
     return ResponseEntity.badRequest()
             .body(e.getMessage()+" "+ e);
 }
-@ExceptionHandler(value = JsonProcessingException.class)
-    ResponseEntity<String> handleJsonProcessingException(JsonProcessingException e){
-    return ResponseEntity.internalServerError().build();
-}
+//@ExceptionHandler(value = JsonProcessingException.class)
+//    ResponseEntity<String> handleJsonProcessingException(JsonProcessingException e){
+//    return ResponseEntity.internalServerError().build();
+//}
 }
